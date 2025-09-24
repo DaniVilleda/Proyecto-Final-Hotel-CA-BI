@@ -47,17 +47,15 @@ average_ratings_per_hotel = full_ratings_df.groupby('name')[rating_columns].mean
 # Emojis para cada atributo
 emoji_map = {"service": "🛎️", "cleanliness": "🧼", "overall": "⭐","value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"}
 
-# Estilos y diseño (BLOQUE CORREGIDO)
-st.markdown("""
-    <style>
-        .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
-        .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
-        .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
-        .review-text { font-size: 15px; color: #444; line-height: 1.5; }
-        .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
-        .rating-line { margin: 8px 0; font-size: 15px; color: #333; display: flex; align-items: center; justify-content: space-between; }
-    </style>
-""", unsafe_allow_html=True)
+# Estilos y diseño
+st.markdown("""<style>
+    .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+    .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
+    .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
+    .review-text { font-size: 15px; color: #444; line-height: 1.5; }
+    .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
+    .rating-line { margin: 8px 0; font-size: 15px; color: #333; display: flex; align-items: center; justify-content: space-between; }
+    </style>""", unsafe_allow_html=True)
 
 # Título principal de la aplicación
 st.title("🏨 Explorador de Reviews por Tópico y Hotel")
@@ -113,7 +111,7 @@ else:
             ratings_html += '</div>'
             st.markdown(ratings_html, unsafe_allow_html=True)
 
-        # --- Columna 3: Gráfico "Delta" Apilado ---
+        # --- Columna 3: Gráfico (Título Corregido) ---
         with col3:
             st.markdown('<div class="content-box">', unsafe_allow_html=True)
             
@@ -124,7 +122,8 @@ else:
                 hotel_scores = {key: float(value) for key, value in current_ratings_dict.items() if str(value).replace('.', '', 1).isdigit()}
                 
                 if hotel_scores:
-                    st.write("#### Calificación de la Review vs. Promedio del Hotel")
+                    # --- CAMBIO AQUÍ: Usamos st.markdown para el título ---
+                    st.markdown('<p class="ratings-title">Calificación vs. Promedio del Hotel</p>', unsafe_allow_html=True)
                     
                     comparison_df = pd.DataFrame({
                         'Review': pd.Series(hotel_scores),
