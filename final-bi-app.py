@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import ast
+import plotly.express as px
+import plotly.graph_objects as go # <--- ESTA ES LA LÍNEA QUE FALTABA
 
 # Configuración de la página para que ocupe todo el ancho
 st.set_page_config(layout="wide")
@@ -8,7 +10,7 @@ st.set_page_config(layout="wide")
 # Cargar dataset
 df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
 
-# Convertir columna ratings a diccionario
+# Convertir columna ratings a diccionario de forma segura
 def parse_ratings(val):
     try:
         return ast.literal_eval(val) if isinstance(val, str) else {}
@@ -17,6 +19,19 @@ def parse_ratings(val):
 
 df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 df['text'] = df['text'].astype(str)
+
+# --- CÁLCULO DE PROMEDIOS GENERALES ---
+# Convertimos la columna de diccionarios en un DataFrame limpio
+ratings_df = pd.json_normalize(df['ratings_parsed'])
+
+# Nos aseguramos de que todas las columnas de ratings sean numéricas
+for col in ratings_df.columns:
+    ratings_df[col] = pd.to_numeric(ratings_df[col], errors='coerce')
+
+# Calculamos el promedio de cada columna (atributo)
+average_ratings = ratings_df.mean().round(1)
+# ------------------------------------
+
 
 # Emojis para cada atributo
 emoji_map = {"service": "🛎️", "cleanliness": "🧼", "overall": "⭐","value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"}
@@ -82,7 +97,7 @@ for idx, row in filtered_df.iterrows():
         ratings_html += '</div>'
         st.markdown(ratings_html, unsafe_allow_html=True)
 
-   # Columna 3: Gráfico Comparativo con Promedios
+    # Columna 3: Gráfico Comparativo con Promedios
     with col3:
         st.markdown('<div class="content-box">', unsafe_allow_html=True)
         
@@ -93,11 +108,11 @@ for idx, row in filtered_df.iterrows():
             df_hotel = pd.DataFrame(list(original_ratings_dict.items()), columns=['Atributo', 'Puntaje'])
             df_hotel['Puntaje'] = pd.to_numeric(df_hotel['Puntaje'], errors='coerce')
             df_hotel.dropna(inplace=True)
-    
+
             if not df_hotel.empty:
                 # Creamos la figura usando graph_objects para tener más control
                 fig = go.Figure()
-    
+
                 # 1. Añadimos las BARRAS del hotel actual
                 fig.add_trace(go.Bar(
                     y=df_hotel['Atributo'],
@@ -108,7 +123,7 @@ for idx, row in filtered_df.iterrows():
                     textposition='outside',
                     marker_color='#007bff'
                 ))
-    
+
                 # 2. Añadimos los MARCADORES del promedio general
                 df_avg = average_ratings.reindex(df_hotel['Atributo']).reset_index()
                 df_avg.columns = ['Atributo', 'Promedio']
@@ -120,15 +135,15 @@ for idx, row in filtered_df.iterrows():
                     mode='markers',
                     marker_symbol='diamond',
                     marker_size=12,
-                    marker_color='rgba(255, 82, 82, 0.8)' # Color rojo para el promedio
+                    marker_color='rgba(255, 82, 82, 0.8)'
                 ))
-    
+
                 # Personalizamos el diseño
                 fig.update_layout(
                     barmode='overlay',
                     showlegend=True,
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                    xaxis=dict(range=[0, 5.5]), # Ampliamos el rango para que quepa el texto
+                    xaxis=dict(range=[0, 5.5]),
                     yaxis=dict(autorange="reversed"),
                     margin=dict(l=10, r=10, t=10, b=10),
                     height=250,
@@ -136,7 +151,7 @@ for idx, row in filtered_df.iterrows():
                     plot_bgcolor='rgba(0,0,0,0)'
                 )
                 fig.update_xaxes(showticklabels=False)
-    
+
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.write("No hay ratings numéricos para graficar.")
