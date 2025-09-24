@@ -35,6 +35,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# 1. TÍTULO PRINCIPAL RESTAURADO
+st.title("🏨 Explorador de Reviews por Tópico y Hotel")
+
 # Filtros
 topics = df['topic_label'].unique().tolist()
 selected_topic = st.selectbox("📌 Selecciona un tópico", topics)
@@ -54,7 +57,7 @@ filtered_df = filtered_df.head(n_reviews)
 for idx, row in filtered_df.iterrows():
     ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
 
-    # El div "card" es nuestro contenedor principal, no necesitamos st.container()
+    # 2. SE ELIMINÓ EL "with st.container()" QUE CAUSABA LOS CUADROS EXTRA
     st.markdown('<div class="card">', unsafe_allow_html=True)
     
     st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
