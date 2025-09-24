@@ -84,7 +84,7 @@ else:
     for idx, row in filtered_df.iterrows():
         st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
 
-        col1, col2, col3 = st.columns([1.5, 1.3, 2])
+        col1, col2, col3 = st.columns([1.8, 1.3, 2])
 
         # Columna 1: Review
         with col1:
