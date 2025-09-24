@@ -1,9 +1,8 @@
 import streamlit as st
 import pandas as pd
 import ast
-import plotly.express as px
 
-# Esta debe ser la primera commande de Streamlit en tu script
+# Configuración de la página para que ocupe todo el ancho
 st.set_page_config(layout="wide")
 
 # Cargar dataset
@@ -34,19 +33,21 @@ st.markdown("""
         .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
         .review-text { font-size: 15px; color: #444; line-height: 1.5; }
         .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
+        .rating-line { margin: 5px 0; font-size: 15px; color: #333; }
     </style>
 """, unsafe_allow_html=True)
 
 # Título principal de la aplicación
 st.title("🏨 Explorador de Reviews por Tópico y Hotel")
 
-# Filtros y lógica de datos...
+# Filtros
 topics = df['topic_label'].unique().tolist()
 selected_topic = st.selectbox("📌 Selecciona un tópico", topics)
 hotel_options = ['Todos'] + sorted(df['name'].unique().tolist())
 selected_hotel = st.selectbox("🏩 Selecciona un hotel", hotel_options)
 n_reviews = st.slider("📊 Número máximo de reviews a mostrar", 1, 20, 5)
 
+# Filtrado de datos
 filtered_df = df[df['topic_label'] == selected_topic]
 if selected_hotel != 'Todos':
     filtered_df = filtered_df[filtered_df['name'] == selected_hotel]
@@ -58,11 +59,14 @@ filtered_df = filtered_df.head(n_reviews)
 for idx, row in filtered_df.iterrows():
     ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
 
+    # El div "card" es nuestro contenedor principal
     st.markdown('<div class="card">', unsafe_allow_html=True)
+    
     st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns([2, 1])
 
+    # --- Columna 1: Review ---
     with col1:
         review_html = f"""
         <div class="content-box">
@@ -71,26 +75,25 @@ for idx, row in filtered_df.iterrows():
         """
         st.markdown(review_html, unsafe_allow_html=True)
 
+    # --- Columna 2: Ratings como texto ---
     with col2:
-        st.markdown('<div class="content-box">', unsafe_allow_html=True)
-        st.markdown('<p class="ratings-title">Ratings:</p>', unsafe_allow_html=True)
+        ratings_html = '<div class="content-box">'
+        ratings_html += '<p class="ratings-title">Ratings:</p>'
         
         if ratings_dict:
-            df_ratings = pd.DataFrame(list(ratings_dict.items()), columns=['Atributo', 'Puntaje'])
-            df_ratings['Puntaje'] = pd.to_numeric(df_ratings['Puntaje'], errors='coerce')
-            df_ratings.dropna(inplace=True)
+            overall_value = ratings_dict.pop('overall', None)
+            if overall_value is not None:
+                emoji = emoji_map.get('overall', "⭐")
+                ratings_html += f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>'
             
-            if not df_ratings.empty:
-                fig = px.bar(df_ratings, x='Puntaje', y='Atributo', orientation='h', text='Puntaje', range_x=[0, 5])
-                fig.update_layout(showlegend=False, xaxis_title="", yaxis_title="", yaxis=dict(autorange="reversed"), margin=dict(l=10, r=10, t=10, b=10), height=250, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-                fig.update_traces(marker_color='#007bff', textposition='outside')
-                fig.update_xaxes(showticklabels=False)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.write("No hay ratings numéricos para mostrar.")
+            for key, value in sorted(ratings_dict.items()):
+                emoji = emoji_map.get(key, "🔹")
+                ratings_html += f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>'
         else:
-            st.write("No hay ratings disponibles.")
-            
-        st.markdown('</div>', unsafe_allow_html=True)
+            ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
+        
+        ratings_html += '</div>'
+        st.markdown(ratings_html, unsafe_allow_html=True)
 
+    # Cierre del div "card"
     st.markdown('</div>', unsafe_allow_html=True)
