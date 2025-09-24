@@ -89,8 +89,8 @@ for idx, row in filtered_df.iterrows():
     # --- Columna 2: Ratings con Estrellas ---
     with col2:
         ratings_dict = row.get("ratings_parsed", {}).copy()
-        ratings_html = """<div class="content-box">"""
-        ratings_html += """<p class="ratings-title">Ratings de esta Review:</p>"""
+        ratings_html = '<div class="content-box">'
+        ratings_html += '<p class="ratings-title">Ratings de esta Review:</p>'
         
         if ratings_dict:
             overall_value = ratings_dict.pop('overall', None)
@@ -100,14 +100,13 @@ for idx, row in filtered_df.iterrows():
                 ratings_html += f'<div class="rating-line"><span>{emoji} Overall</span> <span>{stars}</span></div>'
             
             for key, value in sorted(ratings_dict.items()):
-                # --- LÍNEA CORREGIDA AQUÍ ---
                 emoji = emoji_map.get(key, "🔹")
                 stars = generate_stars(value)
                 ratings_html += f'<div class="rating-line"><span>{emoji} {key.capitalize()}</span> <span>{stars}</span></div>'
         else:
-            ratings_html += """<p class="rating-line">No hay ratings disponibles.</p>"""
+            ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
         
-        ratings_html += """</div>"""
+        ratings_html += '</div>'
         st.markdown(ratings_html, unsafe_allow_html=True)
 
     # --- Columna 3: Gráfico Comparativo (sin Plotly) ---
@@ -117,26 +116,32 @@ for idx, row in filtered_df.iterrows():
         hotel_name = row['name']
         current_ratings_dict = row.get("ratings_parsed", {})
         
-        if current_ratings_dict and hotel_name in average_ratings_per_hotel.index:
-            hotel_scores = {key: float(value) for key, value in current_ratings_dict.items() if str(value).replace('.', '', 1).isdigit()}
-            hotel_avg_scores = average_ratings_per_hotel.loc[hotel_name]
+        with container:
+            st.markdown('<div class="content-box">', unsafe_allow_html=True)
             
-            if hotel_scores:
-                df_comparison = pd.DataFrame({'Esta Review': pd.Series(hotel_scores), 'Promedio del Hotel': hotel_avg_scores})
-                df_comparison.dropna(inplace=True) 
+            if current_ratings_dict and hotel_name in average_ratings_per_hotel.index:
+                # Preparamos los datos
+                hotel_scores = {key: float(value) for key, value in current_ratings_dict.items() if str(value).replace('.', '', 1).isdigit()}
+                hotel_avg_scores = average_ratings_per_hotel.loc[hotel_name].to_dict()
+                
+                # Creamos sub-columnas dentro de la columna 3
+                sub_col1, sub_col2 = st.columns(2)
 
-                with container:
-                    st.markdown('<div class="content-box">', unsafe_allow_html=True)
-                    st.write("#### Comparativa de Ratings (vs. Promedio del Hotel)")
-                    st.bar_chart(df_comparison, height=300)
-                    st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                 with container:
-                    st.markdown('<div class="content-box">', unsafe_allow_html=True)
+                if hotel_scores:
+                    # Gráfico 1: Puntuación de esta review
+                    with sub_col1:
+                        st.write("##### Esta Review")
+                        df_review = pd.DataFrame.from_dict(hotel_scores, orient='index', columns=['Puntaje'])
+                        st.bar_chart(df_review, height=250)
+
+                    # Gráfico 2: Promedio del hotel
+                    with sub_col2:
+                        st.write("##### Promedio del Hotel")
+                        df_avg = pd.DataFrame.from_dict(hotel_avg_scores, orient='index', columns=['Puntaje'])
+                        st.bar_chart(df_avg, height=250)
+                else:
                     st.write("No hay ratings numéricos para graficar.")
-                    st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            with container:
-                st.markdown('<div class="content-box">', unsafe_allow_html=True)
+            else:
                 st.write("No hay ratings disponibles para comparar.")
-                st.markdown('</div>', unsafe_allow_html=True)
+                
+            st.markdown('</div>', unsafe_allow_html=True)
