@@ -34,6 +34,16 @@ def parse_ratings(val):
 df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 df['text'] = df['text'].astype(str)
 
+# --- CÁLCULO DE PROMEDIOS POR HOTEL ---
+df_for_avg = df[['name', 'ratings_parsed']].copy()
+ratings_df = pd.json_normalize(df_for_avg['ratings_parsed'])
+full_ratings_df = pd.concat([df_for_avg['name'], ratings_df], axis=1)
+rating_columns = ratings_df.columns
+for col in rating_columns:
+    full_ratings_df[col] = pd.to_numeric(full_ratings_df[col], errors='coerce')
+average_ratings_per_hotel = full_ratings_df.groupby('name')[rating_columns].mean().round(1)
+# ------------------------------------
+
 # Emojis para cada atributo
 emoji_map = {"service": "🛎️", "cleanliness": "🧼", "overall": "⭐","value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"}
 
@@ -85,4 +95,17 @@ for idx, row in filtered_df.iterrows():
         if ratings_dict:
             overall_value = ratings_dict.pop('overall', None)
             if overall_value is not None:
-                emoji = emoji
+                emoji = emoji_map.get('overall', "⭐")
+                stars = generate_stars(overall_value)
+                ratings_html += f'<div class="rating-line"><span>{emoji} Overall</span> <span>{stars}</span></div>'
+            
+            for key, value in sorted(ratings_dict.items()):
+                # --- LÍNEA CORREGIDA AQUÍ ---
+                emoji = emoji_map.get(key, "🔹")
+                stars = generate_stars(value)
+                ratings_html += f'<div class="rating-line"><span>{emoji} {key.capitalize()}</span> <span>{stars}</span></div>'
+        else:
+            ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
+        
+        ratings_html += '</div>'
+        st.markdown(ratings_html,
