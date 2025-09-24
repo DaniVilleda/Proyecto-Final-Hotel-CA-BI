@@ -74,38 +74,3 @@ if selected_hotel != 'Todos':
 else:
     filtered_df = filtered_df.drop_duplicates(subset=['name'])
 filtered_df = filtered_df.head(n_reviews)
-
-# Mostrar resultados
-for idx, row in filtered_df.iterrows():
-    st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([2, 1, 2])
-
-    # --- Columna 1: Review ---
-    with col1:
-        review_html = f"""<div class="content-box"><p class="review-text">{row['text']}</p></div>"""
-        st.markdown(review_html, unsafe_allow_html=True)
-
-    # --- Columna 2: Ratings con Estrellas ---
-    with col2:
-        ratings_dict = row.get("ratings_parsed", {}).copy()
-        ratings_html = '<div class="content-box">'
-        ratings_html += '<p class="ratings-title">Ratings de esta Review:</p>'
-        
-        if ratings_dict:
-            overall_value = ratings_dict.pop('overall', None)
-            if overall_value is not None:
-                emoji = emoji_map.get('overall', "⭐")
-                stars = generate_stars(overall_value)
-                ratings_html += f'<div class="rating-line"><span>{emoji} Overall</span> <span>{stars}</span></div>'
-            
-            for key, value in sorted(ratings_dict.items()):
-                # --- LÍNEA CORREGIDA AQUÍ ---
-                emoji = emoji_map.get(key, "🔹")
-                stars = generate_stars(value)
-                ratings_html += f'<div class="rating-line"><span>{emoji} {key.capitalize()}</span> <span>{stars}</span></div>'
-        else:
-            ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
-        
-        ratings_html += '</div>'
-        st.markdown(ratings_html,
