@@ -125,8 +125,8 @@ else:
                     st.markdown('<div class="content-box" style="padding-bottom: 0; margin-bottom: 0;"><p class="ratings-title">Calificación de la Review vs. Promedio del Hotel</p></div>', unsafe_allow_html=True)
                     comparison_df = pd.DataFrame({'Review': pd.Series(hotel_scores), 'Promedio': average_ratings_per_hotel.loc[hotel_name]}).dropna()
                     stacked_df = pd.DataFrame(index=comparison_df.index)
-                    stacked_df['Promedio Hotel'] = comparison_df['Promedio']
-                    stacked_df['Rating Review'] = (comparison_df['Review'] - comparison_df['Promedio']).clip(lower=0)
+                    stacked_df['Promedio Hotel'] = (comparison_df['Promedio']-(comparison_df['Review']).clip(lower=0)
+                    stacked_df['Rating Review'] = comparison_df['Review']
                     
                     st.bar_chart(stacked_df, height=300)
                 else:
