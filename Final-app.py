@@ -68,11 +68,7 @@ for idx, row in filtered_df.iterrows():
 
     # Columna 1: Review
     with col1:
-        review_html = f"""
-        <div class="content-box">
-            <p class="review-text">{row['text']}</p>
-        </div>
-        """
+        review_html = f"""<div class="content-box"><p class="review-text">{row['text']}</p></div>"""
         st.markdown(review_html, unsafe_allow_html=True)
 
     # Columna 2: Ratings
