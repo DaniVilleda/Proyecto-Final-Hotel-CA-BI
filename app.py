@@ -9,7 +9,7 @@ st.markdown("""
     <style>
         /* Fondo general */
         .stApp {
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            background: linear-gradient(135deg, #e6157a 0%, #ebedee 100%);
             font-family: 'Segoe UI', sans-serif;
         }
 
@@ -26,7 +26,7 @@ st.markdown("""
 
         /* Tarjetas para cada review */
         .review-card {
-            background: black;
+            background: white;
             padding: 15px;
             margin: 12px 0;
             border-radius: 12px;
