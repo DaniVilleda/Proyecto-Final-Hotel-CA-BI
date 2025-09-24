@@ -47,11 +47,98 @@ average_ratings_per_hotel = full_ratings_df.groupby('name')[rating_columns].mean
 # Emojis para cada atributo
 emoji_map = {"service": "🛎️", "cleanliness": "🧼", "overall": "⭐","value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"}
 
-# Estilos y diseño
-st.markdown("""<style>
-    .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
-    .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
-    .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
-    .review-text { font-size: 15px; color: #444; line-height: 1.5; }
-    .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
-    .rating-line { margin: 8px 0; font-size: 15px; color
+# Estilos y diseño (BLOQUE CORREGIDO)
+st.markdown("""
+    <style>
+        .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+        .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
+        .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
+        .review-text { font-size: 15px; color: #444; line-height: 1.5; }
+        .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
+        .rating-line { margin: 8px 0; font-size: 15px; color: #333; display: flex; align-items: center; justify-content: space-between; }
+    </style>
+""", unsafe_allow_html=True)
+
+# Título principal de la aplicación
+st.title("🏨 Explorador de Reviews por Tópico y Hotel")
+
+# Filtros
+topics = df['topic_label'].unique().tolist()
+selected_topic = st.selectbox("📌 Selecciona un tópico", topics)
+hotel_options = ['Todos'] + sorted(df['name'].unique().tolist())
+selected_hotel = st.selectbox("🏩 Selecciona un hotel", hotel_options)
+n_reviews = st.slider("📊 Número máximo de reviews a mostrar", 1, 20, 5)
+
+# Filtrado de datos
+filtered_df = df[df['topic_label'] == selected_topic]
+if selected_hotel != 'Todos':
+    filtered_df = filtered_df[filtered_df['name'] == selected_hotel]
+else:
+    filtered_df = filtered_df.drop_duplicates(subset=['name'])
+filtered_df = filtered_df.head(n_reviews)
+
+# --- Comprobación y Muestra de Resultados ---
+if filtered_df.empty:
+    st.warning("⚠️ No se encontraron reviews que coincidan con los filtros seleccionados. Por favor, intenta con otra combinación.")
+else:
+    for idx, row in filtered_df.iterrows():
+        st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
+
+        col1, col2, col3 = st.columns([2, 1, 2])
+
+        # --- Columna 1: Review ---
+        with col1:
+            st.markdown(f"""<div class="content-box"><p class="review-text">{row['text']}</p></div>""", unsafe_allow_html=True)
+
+        # --- Columna 2: Ratings con Estrellas ---
+        with col2:
+            ratings_dict = row.get("ratings_parsed", {}).copy()
+            ratings_html = '<div class="content-box">'
+            ratings_html += '<p class="ratings-title">Ratings de esta Review:</p>'
+            
+            if ratings_dict:
+                overall_value = ratings_dict.pop('overall', None)
+                if overall_value is not None:
+                    emoji = emoji_map.get('overall', "⭐")
+                    stars = generate_stars(overall_value)
+                    ratings_html += f'<div class="rating-line"><span>{emoji} Overall</span> <span>{stars}</span></div>'
+                
+                for key, value in sorted(ratings_dict.items()):
+                    emoji = emoji_map.get(key, "🔹")
+                    stars = generate_stars(value)
+                    ratings_html += f'<div class="rating-line"><span>{emoji} {key.capitalize()}</span> <span>{stars}</span></div>'
+            else:
+                ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
+            
+            ratings_html += '</div>'
+            st.markdown(ratings_html, unsafe_allow_html=True)
+
+        # --- Columna 3: Gráfico "Delta" Apilado ---
+        with col3:
+            st.markdown('<div class="content-box">', unsafe_allow_html=True)
+            
+            hotel_name = row['name']
+            current_ratings_dict = row.get("ratings_parsed", {})
+            
+            if current_ratings_dict and hotel_name in average_ratings_per_hotel.index:
+                hotel_scores = {key: float(value) for key, value in current_ratings_dict.items() if str(value).replace('.', '', 1).isdigit()}
+                
+                if hotel_scores:
+                    st.write("#### Calificación de la Review vs. Promedio del Hotel")
+                    
+                    comparison_df = pd.DataFrame({
+                        'Review': pd.Series(hotel_scores),
+                        'Promedio': average_ratings_per_hotel.loc[hotel_name]
+                    }).dropna()
+
+                    stacked_df = pd.DataFrame(index=comparison_df.index)
+                    stacked_df['Promedio (Base)'] = comparison_df['Promedio']
+                    stacked_df['Mejora de la Review'] = (comparison_df['Review'] - comparison_df['Promedio']).clip(lower=0)
+                    
+                    st.bar_chart(stacked_df, height=300)
+                else:
+                    st.write("No hay ratings numéricos para graficar.")
+            else:
+                st.write("No hay ratings disponibles para comparar.")
+            
+            st.markdown('</div>', unsafe_allow_html=True)
