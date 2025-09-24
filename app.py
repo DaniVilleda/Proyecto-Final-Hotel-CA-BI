@@ -25,7 +25,7 @@ emoji_map = {
     "rooms": "🚪"
 }
 
-# Estilos
+# Estilos CSS
 st.markdown("""
     <style>
         .stApp {
@@ -33,23 +33,22 @@ st.markdown("""
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Tarjetas generales */
+        /* Tarjeta principal */
         .card {
             background: white;
-            padding: 18px;
-            margin: 12px 0;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+            padding: 22px;
+            margin: 16px 0;
+            border-radius: 14px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
         }
 
-        /* Título del hotel */
+        /* Título centrado */
         .hotel-title {
             font-size: 22px;
             font-weight: bold;
             color: #2C3E50;
-            border-left: 6px solid #3498db;
-            padding-left: 12px;
-            margin-bottom: 0;
+            text-align: center;
+            margin-bottom: 18px;
         }
 
         /* Texto de review */
@@ -59,16 +58,17 @@ st.markdown("""
             line-height: 1.5;
         }
 
-        /* Título de Ratings */
+        /* Título Ratings */
         .ratings-title {
             font-weight: bold;
             font-size: 16px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            color: #2C3E50;
         }
 
         /* Cada línea de rating */
         .rating-line {
-            margin: 4px 0;
+            margin: 5px 0;
             font-size: 15px;
             color: #333;
         }
@@ -101,28 +101,23 @@ filtered_df = filtered_df.head(n_reviews)
 for idx, row in filtered_df.iterrows():
     ratings_dict = row["ratings_parsed"]
 
-    # Título en su tarjeta
-    st.markdown(f"""
-        <div class="card">
-            <p class="hotel-title">🏨 {row['name']}</p>
-        </div>
-    """, unsafe_allow_html=True)
+    # Tarjeta completa
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    # Texto de review en otra tarjeta
-    st.markdown(f"""
-        <div class="card">
-            <p class="review-text">{row['text']}</p>
-        </div>
-    """, unsafe_allow_html=True)
+        # Título centrado
+        st.markdown(f"<p class='hotel-title'>🏨 {row['name']}</p>", unsafe_allow_html=True)
 
-    # Ratings en su propia tarjeta
-    st.markdown("""
-        <div class="card">
-            <p class="ratings-title">Ratings:</p>
-    """, unsafe_allow_html=True)
+        # Dos columnas
+        col1, col2 = st.columns([2,1])
 
-    for key, value in ratings_dict.items():
-        emoji = emoji_map.get(key, "🔹")
-        st.markdown(f"<p class='rating-line'>{emoji} {key.capitalize()}: {value}/5</p>", unsafe_allow_html=True)
+        with col1:
+            st.markdown(f"<p class='review-text'>{row['text']}</p>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        with col2:
+            st.markdown("<p class='ratings-title'>Ratings:</p>", unsafe_allow_html=True)
+            for key, value in ratings_dict.items():
+                emoji = emoji_map.get(key, "🔹")
+                st.markdown(f"<p class='rating-line'>{emoji} {key.capitalize()}: {value}/5</p>", unsafe_allow_html=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
