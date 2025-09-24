@@ -82,28 +82,62 @@ for idx, row in filtered_df.iterrows():
         ratings_html += '</div>'
         st.markdown(ratings_html, unsafe_allow_html=True)
 
-    # Columna 3: Gráfico con la función nativa de Streamlit
+   # Columna 3: Gráfico Comparativo con Promedios
     with col3:
         st.markdown('<div class="content-box">', unsafe_allow_html=True)
         
-        # Re-copiamos el diccionario original porque en col2 usamos .pop() y lo modificamos
-        original_ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
+        original_ratings_dict = row.get("ratings_parsed", {}).copy()
         
         if original_ratings_dict:
-            # Convertimos los ratings a un formato numérico, ignorando los que no lo son
-            numeric_ratings = {}
-            for key, value in original_ratings_dict.items():
-                try:
-                    numeric_ratings[key] = float(value)
-                except (ValueError, TypeError):
-                    continue # Ignora este rating si no es un número
-
-            if numeric_ratings:
-                # Creamos un DataFrame simple para el gráfico
-                df_chart = pd.DataFrame.from_dict(numeric_ratings, orient='index', columns=['Puntaje'])
+            # Convertimos los ratings del hotel actual a un DataFrame
+            df_hotel = pd.DataFrame(list(original_ratings_dict.items()), columns=['Atributo', 'Puntaje'])
+            df_hotel['Puntaje'] = pd.to_numeric(df_hotel['Puntaje'], errors='coerce')
+            df_hotel.dropna(inplace=True)
+    
+            if not df_hotel.empty:
+                # Creamos la figura usando graph_objects para tener más control
+                fig = go.Figure()
+    
+                # 1. Añadimos las BARRAS del hotel actual
+                fig.add_trace(go.Bar(
+                    y=df_hotel['Atributo'],
+                    x=df_hotel['Puntaje'],
+                    name='Hotel Actual',
+                    orientation='h',
+                    text=df_hotel['Puntaje'],
+                    textposition='outside',
+                    marker_color='#007bff'
+                ))
+    
+                # 2. Añadimos los MARCADORES del promedio general
+                df_avg = average_ratings.reindex(df_hotel['Atributo']).reset_index()
+                df_avg.columns = ['Atributo', 'Promedio']
                 
-                # Usamos el comando integrado de Streamlit, ¡y listo!
-                st.bar_chart(df_chart, height=250)
+                fig.add_trace(go.Scatter(
+                    y=df_avg['Atributo'],
+                    x=df_avg['Promedio'],
+                    name='Promedio General',
+                    mode='markers',
+                    marker_symbol='diamond',
+                    marker_size=12,
+                    marker_color='rgba(255, 82, 82, 0.8)' # Color rojo para el promedio
+                ))
+    
+                # Personalizamos el diseño
+                fig.update_layout(
+                    barmode='overlay',
+                    showlegend=True,
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                    xaxis=dict(range=[0, 5.5]), # Ampliamos el rango para que quepa el texto
+                    yaxis=dict(autorange="reversed"),
+                    margin=dict(l=10, r=10, t=10, b=10),
+                    height=250,
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)'
+                )
+                fig.update_xaxes(showticklabels=False)
+    
+                st.plotly_chart(fig, use_container_width=True)
             else:
                 st.write("No hay ratings numéricos para graficar.")
         else:
