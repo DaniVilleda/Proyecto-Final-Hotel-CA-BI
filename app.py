@@ -9,7 +9,7 @@ st.markdown("""
     <style>
         /* Fondo general */
         .stApp {
-            background: linear-gradient(135deg, #e6157a 0%, #ebedee 100%);
+            background: linear-gradient(135deg, #e8e5e3 0%, #d3dfe0 100%);
             font-family: 'Segoe UI', sans-serif;
         }
 
