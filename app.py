@@ -39,7 +39,7 @@ st.markdown("""
         /* Rating destacado */
         .rating {
             font-weight: bold;
-            color: #e67e22;
+            color: #6a6b6b;
             font-size: 16px;
         }
 
