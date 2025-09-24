@@ -26,7 +26,7 @@ st.markdown("""
 
         /* Tarjetas para cada review */
         .review-card {
-            background: white;
+            background: black;
             padding: 15px;
             margin: 12px 0;
             border-radius: 12px;
