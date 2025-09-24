@@ -80,20 +80,4 @@ if filtered_df.empty:
     st.warning("⚠️ No se encontraron reviews que coincidan con los filtros seleccionados. Por favor, intenta con otra combinación.")
 else:
     for idx, row in filtered_df.iterrows():
-        st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
-
-        col1, col2, col3 = st.columns([2, 1, 2])
-
-        # --- Columna 1: Review ---
-        with col1:
-            review_html = f"""<div class="content-box"><p class="review-text">{row['text']}</p></div>"""
-            st.markdown(review_html, unsafe_allow_html=True)
-
-        # --- Columna 2: Ratings con Estrellas ---
-        with col2:
-            ratings_dict = row.get("ratings_parsed", {}).copy()
-            ratings_html = '<div class="content-box">'
-            ratings_html += '<p class="ratings-title">Ratings de esta Review:</p>'
-            
-            if ratings_dict:
-                overall_value = ratings_dict
+        st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html
