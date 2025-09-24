@@ -19,18 +19,20 @@ df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 df['text'] = df['text'].astype(str)
 
 # Emojis para cada atributo
-emoji_map = {
-    "service": "🛎️", "cleanliness": "🧼", "overall": "⭐",
-    "value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"
-}
+emoji_map = {"service": "🛎️", "cleanliness": "🧼", "overall": "⭐","value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"}
 
 # Estilos CSS
 st.markdown("""
     <style>
+    /* Fondo general */
         .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+    /* Cuadro Blanco */
         .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
+    /* Título Hotel */
         .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
+    /* Review */ 
         .review-text { font-size: 15px; color: #444; line-height: 1.5; }
+    /* Ratings y espaciado */ 
         .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
         .rating-line { margin: 5px 0; font-size: 15px; color: #333; }
     </style>
