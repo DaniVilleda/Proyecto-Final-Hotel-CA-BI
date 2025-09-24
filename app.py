@@ -19,7 +19,7 @@ st.markdown("""
             font-size: 20px;
             margin-bottom: 5px;
             border-left: 2px solid #e44a36;
-            padding-left: 10px;
+            padding-left: 5px;
         }
 
         /* Tarjetas para cada review */
