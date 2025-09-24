@@ -24,7 +24,8 @@ emoji_map = {"service": "🛎️",
             "rooms": "🚪"}
 
 # Estilo y diseño
-st.markdown("""<style>
+st.markdown("""
+<style>
         .stApp {
             background: #e61595;
             font-family: 'Segoe UI', sans-serif;
