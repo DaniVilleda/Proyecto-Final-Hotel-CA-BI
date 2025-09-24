@@ -34,16 +34,6 @@ def parse_ratings(val):
 df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 df['text'] = df['text'].astype(str)
 
-# --- CÁLCULO DE PROMEDIOS POR HOTEL ---
-df_for_avg = df[['name', 'ratings_parsed']].copy()
-ratings_df = pd.json_normalize(df_for_avg['ratings_parsed'])
-full_ratings_df = pd.concat([df_for_avg['name'], ratings_df], axis=1)
-rating_columns = ratings_df.columns
-for col in rating_columns:
-    full_ratings_df[col] = pd.to_numeric(full_ratings_df[col], errors='coerce')
-average_ratings_per_hotel = full_ratings_df.groupby('name')[rating_columns].mean().round(1)
-# ------------------------------------
-
 # Emojis para cada atributo
 emoji_map = {"service": "🛎️", "cleanliness": "🧼", "overall": "⭐","value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"}
 
@@ -95,53 +85,4 @@ for idx, row in filtered_df.iterrows():
         if ratings_dict:
             overall_value = ratings_dict.pop('overall', None)
             if overall_value is not None:
-                emoji = emoji_map.get('overall', "⭐")
-                stars = generate_stars(overall_value)
-                ratings_html += f'<div class="rating-line"><span>{emoji} Overall</span> <span>{stars}</span></div>'
-            
-            for key, value in sorted(ratings_dict.items()):
-                emoji = emoji_map.get(key, "🔹")
-                stars = generate_stars(value)
-                ratings_html += f'<div class="rating-line"><span>{emoji} {key.capitalize()}</span> <span>{stars}</span></div>'
-        else:
-            ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
-        
-        ratings_html += '</div>'
-        st.markdown(ratings_html, unsafe_allow_html=True)
-
-    # --- Columna 3: Gráfico Comparativo (sin Plotly) ---
-    with col3:
-        container = st.container()
-        
-        hotel_name = row['name']
-        current_ratings_dict = row.get("ratings_parsed", {})
-        
-        with container:
-            st.markdown('<div class="content-box">', unsafe_allow_html=True)
-            
-            if current_ratings_dict and hotel_name in average_ratings_per_hotel.index:
-                # Preparamos los datos
-                hotel_scores = {key: float(value) for key, value in current_ratings_dict.items() if str(value).replace('.', '', 1).isdigit()}
-                hotel_avg_scores = average_ratings_per_hotel.loc[hotel_name].to_dict()
-                
-                # Creamos sub-columnas dentro de la columna 3
-                sub_col1, sub_col2 = st.columns(2)
-
-                if hotel_scores:
-                    # Gráfico 1: Puntuación de esta review
-                    with sub_col1:
-                        st.write("##### Esta Review")
-                        df_review = pd.DataFrame.from_dict(hotel_scores, orient='index', columns=['Puntaje'])
-                        st.bar_chart(df_review, height=250)
-
-                    # Gráfico 2: Promedio del hotel
-                    with sub_col2:
-                        st.write("##### Promedio del Hotel")
-                        df_avg = pd.DataFrame.from_dict(hotel_avg_scores, orient='index', columns=['Puntaje'])
-                        st.bar_chart(df_avg, height=250)
-                else:
-                    st.write("No hay ratings numéricos para graficar.")
-            else:
-                st.write("No hay ratings disponibles para comparar.")
-                
-            st.markdown('</div>', unsafe_allow_html=True)
+                emoji = emoji
