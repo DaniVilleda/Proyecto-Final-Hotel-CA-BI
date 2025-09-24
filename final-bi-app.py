@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 # Cargar dataset
 df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
 
-# Convertir columna ratings a diccionario de forma segura
+# Convertir columna ratings a diccionario
 def parse_ratings(val):
     try:
         return ast.literal_eval(val) if isinstance(val, str) else {}
@@ -21,9 +21,8 @@ df['text'] = df['text'].astype(str)
 # Emojis para cada atributo
 emoji_map = {"service": "🛎️", "cleanliness": "🧼", "overall": "⭐","value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"}
 
-# Estilos CSS
-st.markdown("""
-    <style>
+# Estilos y diseño
+st.markdown("""<style>
     /* Fondo general */
         .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
     /* Cuadro Blanco */
@@ -35,13 +34,12 @@ st.markdown("""
     /* Ratings y espaciado */ 
         .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
         .rating-line { margin: 5px 0; font-size: 15px; color: #333; }
-    </style>
-""", unsafe_allow_html=True)
+    </style>""", unsafe_allow_html=True)
 
 # Título principal de la aplicación
 st.title("🏨 Explorador de Reviews por Tópico y Hotel")
 
-# Filtros
+# Filtros y widgets respectivos
 topics = df['topic_label'].unique().tolist()
 selected_topic = st.selectbox("📌 Selecciona un tópico", topics)
 hotel_options = ['Todos'] + sorted(df['name'].unique().tolist())
@@ -56,27 +54,20 @@ else:
     filtered_df = filtered_df.drop_duplicates(subset=['name'])
 filtered_df = filtered_df.head(n_reviews)
 
-# --- Mostrar resultados ---
+# Mostrar resultados
 for idx, row in filtered_df.iterrows():
     ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
-
-    # El div "card" es nuestro contenedor principal
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    
+    st.markdown('<div class="card">', unsafe_allow_html=True)    
     st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns([2, 1])
 
-    # --- Columna 1: Review ---
+    # Columna 1: Review
     with col1:
-        review_html = f"""
-        <div class="content-box">
-            <p class="review-text">{row['text']}</p>
-        </div>
-        """
+        review_html = f"""<div class="content-box"><p class="review-text">{row['text']}</p></div>"""
         st.markdown(review_html, unsafe_allow_html=True)
 
-    # --- Columna 2: Ratings como texto ---
+    # Columna 2: Ratings
     with col2:
         ratings_html = '<div class="content-box">'
         ratings_html += '<p class="ratings-title">Ratings:</p>'
@@ -96,5 +87,5 @@ for idx, row in filtered_df.iterrows():
         ratings_html += '</div>'
         st.markdown(ratings_html, unsafe_allow_html=True)
 
-    # Cierre del div "card"
+    # Cierre
     st.markdown('</div>', unsafe_allow_html=True)
