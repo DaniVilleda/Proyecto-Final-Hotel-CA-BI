@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import ast
 
+# Para hacer la página grande
+st.set_page_config(layout="wide")
+
 # Cargar dataset
 df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
 
