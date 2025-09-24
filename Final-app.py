@@ -32,10 +32,12 @@ st.markdown("""
         .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
     /* Caja título hotel */
         .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
-        .hotel-title { font-size: 22px; font-weight: bold; color: #e6158e; text-align: center; }
+    /* Título hotel */  
+        .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
+    /* Review */  
         .review-text { font-size: 15px; color: #444; line-height: 1.5; }
+    /* Título 'Ratings' */  
         .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
-        .rating-line { margin: 5px 0; font-size: 15px; color: #333; }
     </style>
 """, unsafe_allow_html=True)
 
