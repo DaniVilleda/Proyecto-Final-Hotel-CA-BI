@@ -60,7 +60,7 @@ for idx, row in filtered_df.iterrows():
     st.markdown('<div class="card">', unsafe_allow_html=True)    
     st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
 
-    col1, col2 = st.columns([2, 1])
+col1, col2, col3 = st.columns([2, 1, 2])
 
     # Columna 1: Review
     with col1:
@@ -86,6 +86,35 @@ for idx, row in filtered_df.iterrows():
         
         ratings_html += '</div>'
         st.markdown(ratings_html, unsafe_allow_html=True)
+
+    # Columna 3: Gráfico con la función nativa de Streamlit
+    with col3:
+        st.markdown('<div class="content-box">', unsafe_allow_html=True)
+        
+        # Re-copiamos el diccionario original porque en col2 usamos .pop() y lo modificamos
+        original_ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
+        
+        if original_ratings_dict:
+            # Convertimos los ratings a un formato numérico, ignorando los que no lo son
+            numeric_ratings = {}
+            for key, value in original_ratings_dict.items():
+                try:
+                    numeric_ratings[key] = float(value)
+                except (ValueError, TypeError):
+                    continue # Ignora este rating si no es un número
+
+            if numeric_ratings:
+                # Creamos un DataFrame simple para el gráfico
+                df_chart = pd.DataFrame.from_dict(numeric_ratings, orient='index', columns=['Puntaje'])
+                
+                # Usamos el comando integrado de Streamlit, ¡y listo!
+                st.bar_chart(df_chart, height=250)
+            else:
+                st.write("No hay ratings numéricos para graficar.")
+        else:
+            st.write("No hay ratings disponibles.")
+            
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # Cierre
     st.markdown('</div>', unsafe_allow_html=True)
