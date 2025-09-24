@@ -5,12 +5,24 @@ import pandas as pd
 df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
 
 # Estilos globales con Markdown y CSS
-st.markdown("""<style>
+st.markdown("""
+    <style>
         /* Fondo general */
-        .stApp {background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);font-family: 'Segoe UI', sans-serif;}
+        .stApp {
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            font-family: 'Segoe UI', sans-serif;
+        }
 
         /* Títulos */
-        h1, h2, h3 {color: #e6157a;}
+        h1, h2, h3 {
+            color: #2C3E50;
+        }
+
+        /* Subtítulos */
+        .stMarkdown h2 {
+            border-left: 5px solid #3498db;
+            padding-left: 10px;
+        }
 
         /* Tarjetas para cada review */
         .review-card {
