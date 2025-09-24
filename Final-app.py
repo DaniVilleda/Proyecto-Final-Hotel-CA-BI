@@ -22,12 +22,11 @@ emoji_map = {"service": "🛎️",
              "overall": "⭐",
              "value": "💰", 
              "location": "📍", 
-             "sleep_quality": "💤", 
+             "sleep quality": "💤", 
              "rooms": "🚪"}
 
 # Estilos y diseño base
-st.markdown("""
-    <style>
+st.markdown("""<style>
     /* Fondo general */
         .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
     /* Caja título hotel */
@@ -39,13 +38,12 @@ st.markdown("""
     /* Título 'Ratings' y espaciado */  
         .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
         .rating-line { margin: 5px 0; font-size: 15px; color: #333; }
-    </style>
-""", unsafe_allow_html=True)
+    </style>""", unsafe_allow_html=True)
 
 # Título principal de la aplicación
 st.title("🏨 Explorador de Reviews por Tópico y Hotel")
 
-# Filtros
+# Filtros y respectivos widgets
 topics = df['topic_label'].unique().tolist()
 selected_topic = st.selectbox("📌 Selecciona un tópico", topics)
 hotel_options = ['Todos'] + sorted(df['name'].unique().tolist())
@@ -60,18 +58,15 @@ else:
     filtered_df = filtered_df.drop_duplicates(subset=['name'])
 filtered_df = filtered_df.head(n_reviews)
 
-# --- Mostrar resultados ---
+# Mostrar resultados
 for idx, row in filtered_df.iterrows():
     ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
-
-    # El div "card" es nuestro contenedor principal, no necesitamos st.container()
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    
     st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns([2, 1])
 
-    # --- Columna 1: Review ---
+    # Columna 1: Review
     with col1:
         review_html = f"""
         <div class="content-box">
@@ -80,7 +75,7 @@ for idx, row in filtered_df.iterrows():
         """
         st.markdown(review_html, unsafe_allow_html=True)
 
-    # --- Columna 2: Ratings ---
+    # Columna 2: Ratings
     with col2:
         ratings_html = '<div class="content-box">'
         ratings_html += '<p class="ratings-title">Ratings:</p>'
