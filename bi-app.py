@@ -126,8 +126,8 @@ else:
                     # Preparamos el DataFrame para el gráfico apilado
                     comparison_df = pd.DataFrame({'Review': pd.Series(hotel_scores), 'Promedio': average_ratings_per_hotel.loc[hotel_name]}).dropna()
                     stacked_df = pd.DataFrame(index=comparison_df.index)
-                    stacked_df['Promedio (Base)'] = comparison_df['Promedio']
-                    stacked_df['Mejora de la Review'] = (comparison_df['Review'] - comparison_df['Promedio']).clip(lower=0)
+                    stacked_df['Promedio Hotel'] = comparison_df['Promedio']
+                    stacked_df['Rating Review'] = (comparison_df['Review'] - comparison_df['Promedio']).clip(lower=0)
                     
                     st.bar_chart(stacked_df, height=300)
                 else:
