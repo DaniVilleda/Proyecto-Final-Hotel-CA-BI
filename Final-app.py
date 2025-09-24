@@ -35,9 +35,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Título global
-st.title("🏨 Explorador de Reviews por Tópico y Hotel")
-
 # Filtros
 topics = df['topic_label'].unique().tolist()
 selected_topic = st.selectbox("📌 Selecciona un tópico", topics)
@@ -57,43 +54,41 @@ filtered_df = filtered_df.head(n_reviews)
 for idx, row in filtered_df.iterrows():
     ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
 
-    with st.container():
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
+    # El div "card" es nuestro contenedor principal, no necesitamos st.container()
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    
+    st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
 
-        col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns([2, 1])
 
-        # --- Columna 1: Review ---
-        with col1:
-            # Construir todo el HTML en una sola variable
-            review_html = f"""
-            <div class="content-box">
-                <p class="review-text">{row['text']}</p>
-            </div>
-            """
-            # Mostrar el bloque HTML completo de una vez
-            st.markdown(review_html, unsafe_allow_html=True)
+    # --- Columna 1: Review ---
+    with col1:
+        review_html = f"""
+        <div class="content-box">
+            <p class="review-text">{row['text']}</p>
+        </div>
+        """
+        st.markdown(review_html, unsafe_allow_html=True)
 
-        # --- Columna 2: Ratings ---
-        with col2:
-            # Empezar a construir el HTML
-            ratings_html = '<div class="content-box">'
-            ratings_html += '<p class="ratings-title">Ratings:</p>'
+    # --- Columna 2: Ratings ---
+    with col2:
+        ratings_html = '<div class="content-box">'
+        ratings_html += '<p class="ratings-title">Ratings:</p>'
+        
+        if ratings_dict:
+            overall_value = ratings_dict.pop('overall', None)
+            if overall_value is not None:
+                emoji = emoji_map.get('overall', "⭐")
+                ratings_html += f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>'
             
-            if ratings_dict:
-                overall_value = ratings_dict.pop('overall', None)
-                if overall_value is not None:
-                    emoji = emoji_map.get('overall', "⭐")
-                    ratings_html += f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>'
-                
-                for key, value in sorted(ratings_dict.items()):
-                    emoji = emoji_map.get(key, "🔹")
-                    ratings_html += f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>'
-            else:
-                ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
-            
-            # Cerrar el div y mostrar el bloque HTML completo
-            ratings_html += '</div>'
-            st.markdown(ratings_html, unsafe_allow_html=True)
+            for key, value in sorted(ratings_dict.items()):
+                emoji = emoji_map.get(key, "🔹")
+                ratings_html += f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>'
+        else:
+            ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
+        
+        ratings_html += '</div>'
+        st.markdown(ratings_html, unsafe_allow_html=True)
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    # Cierre del div "card"
+    st.markdown('</div>', unsafe_allow_html=True)
