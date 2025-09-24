@@ -122,7 +122,7 @@ else:
                 hotel_scores = {key: float(value) for key, value in current_ratings_dict.items() if str(value).replace('.', '', 1).isdigit()}
                 
                 if hotel_scores:
-                    st.markdown('<div class="content-box" style="padding-bottom: 0; margin-bottom: 10px;"><p class="ratings-title">Calificación de la Review vs. Promedio del Hotel</p></div>', unsafe_allow_html=True)
+                    st.markdown('<div class="content-box" style="padding-bottom: 10px; margin-bottom: 0;"><p class="ratings-title">Calificación de la Review vs. Promedio del Hotel</p></div>', unsafe_allow_html=True)
                     comparison_df = pd.DataFrame({'Review': pd.Series(hotel_scores), 'Promedio': average_ratings_per_hotel.loc[hotel_name]}).dropna()
                     stacked_df = pd.DataFrame(index=comparison_df.index)
                     stacked_df['Promedio del Hotel'] = comparison_df['Promedio']
