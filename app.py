@@ -23,11 +23,10 @@ emoji_map = {"service": "🛎️",
             "sleep_quality": "💤",
             "rooms": "🚪"}
 
-# Estilo y diseño
 st.markdown("""
-<style>
+    <style>
         .stApp {
-            background: #e61595;
+            background: #f4f6f9;
             font-family: 'Segoe UI', sans-serif;
         }
         .card {
