@@ -16,7 +16,7 @@ st.markdown("""
         /* Rating destacado */
         .rating {
             font-weight: bold;
-            color: #33838a;
+            color: #40b0f3;
         }
 
         /* Separadores */
