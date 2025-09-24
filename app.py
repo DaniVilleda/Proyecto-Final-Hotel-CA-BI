@@ -42,7 +42,7 @@ st.markdown("""
             box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
         }
         
-        /* Nueva clase para los cuadros blancos internos */
+        /* Clase para los cuadros blancos internos */
         .content-box {
             background: white;
             padding: 18px;
@@ -109,7 +109,7 @@ filtered_df = filtered_df.head(n_reviews)
 
 # Mostrar resultados
 for idx, row in filtered_df.iterrows():
-    ratings_dict = row["ratings_parsed"]
+    ratings_dict = row.get("ratings_parsed", {})
 
     # Tarjeta completa
     with st.container():
