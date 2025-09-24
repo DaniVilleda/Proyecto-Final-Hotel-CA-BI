@@ -13,7 +13,7 @@ st.markdown("""
         /* Título principal */
         h1 {
             color: #e01078;
-            text-align: left;
+            text-align: center;
             margin-bottom: 30px;
         }
 
