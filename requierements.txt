@@ -7,7 +7,7 @@
 # openai
 # tiktoken
 # python-dotenv==1.0.1
-plotly
+# plotly
 
 python-dotenv==1.0.1 
 langchain==0.2.2
