@@ -10,7 +10,7 @@ st.markdown("""<style>
         .stApp {background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);font-family: 'Segoe UI', sans-serif;}
 
         /* Títulos */
-        h1, h2, h3 {color: #2C3E50;}
+        h1, h2, h3 {color: #e6157a;}
 
         /* Tarjetas para cada review */
         .review-card {
