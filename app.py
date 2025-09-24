@@ -4,26 +4,59 @@ import pandas as pd
 # Cargar dataset
 df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
 
-# Estilos globales con Markdown y CSS
+# Estilos globales
 st.markdown("""
     <style>
         /* Fondo general */
-        .stApp {background: linear-gradient(135deg, #e8e5e3 0%, #d3dfe0 100%);font-family: 'Segoe UI', sans-serif;}
+        .stApp {
+            background: #f9f9f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Título principal */
+        h1 {
+            color: #2C3E50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Subtítulos (hoteles) */
+        h3 {
+            color: #2C3E50;
+            font-size: 20px;
+            margin-bottom: 5px;
+            border-left: 6px solid #3498db;
+            padding-left: 10px;
+        }
 
         /* Tarjetas para cada review */
-        .review-card {background: white; padding: 15px; margin: 12px 0; border-radius: 12px; box-shadow: 0px 3px 8px rgba(0,0,0,0.1);}
+        .review-card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease-in-out;
+        }
+        .review-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 6px 14px rgba(0,0,0,0.12);
+        }
 
         /* Rating destacado */
         .rating {
             font-weight: bold;
-            color: #40b0f3;
+            color: #e67e22;
+            font-size: 16px;
         }
 
-        /* Separadores */
-        hr {
-            border: 1px solid #ddd;
-            margin: 20px 0;
+        /* Texto de la review */
+        .review-text {
+            font-size: 15px;
+            color: #555;
+            margin-top: 8px;
         }
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -49,12 +82,12 @@ else:
 
 filtered_df = filtered_df.head(n_reviews)
 
-# Mostrar resultados con tarjetas
+# Mostrar resultados con tarjetas elegantes
 for idx, row in filtered_df.iterrows():
     st.markdown(f"""
         <div class="review-card">
             <h3>🏨 {row['name']}</h3>
             <p class="rating">⭐ {row['ratings']}/5</p>
-            <p>{row['text']}</p>
+            <p class="review-text">{row['text']}</p>
         </div>
     """, unsafe_allow_html=True)
