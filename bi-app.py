@@ -58,7 +58,7 @@ st.markdown("""<style>
     </style>""", unsafe_allow_html=True)
 
 # Título principal de la aplicación
-st.title("🏨 Explorador de Reviews por Tópico y Hotel")
+st.title("🏨 Radiografía de un Hotel")
 
 # Filtros
 topics = df['topic_label'].unique().tolist()
@@ -126,8 +126,8 @@ else:
                     # Preparamos el DataFrame para el gráfico apilado
                     comparison_df = pd.DataFrame({'Review': pd.Series(hotel_scores), 'Promedio': average_ratings_per_hotel.loc[hotel_name]}).dropna()
                     stacked_df = pd.DataFrame(index=comparison_df.index)
-                    stacked_df['Promedio (Base)'] = comparison_df['Promedio']
-                    stacked_df['Mejora de la Review'] = (comparison_df['Review'] - comparison_df['Promedio']).clip(lower=0)
+                    stacked_df['Promedio del Hotel'] = comparison_df['Promedio']
+                    stacked_df['Reseña'] = (comparison_df['Review'] - comparison_df['Promedio']).clip(lower=0)
                     
                     st.bar_chart(stacked_df, height=300)
                 else:
