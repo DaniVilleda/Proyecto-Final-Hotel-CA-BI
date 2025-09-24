@@ -16,9 +16,9 @@ df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 
 # Diccionario de emojis por atributo
 emoji_map = {
+    "overall": "⭐", 
     "service": "🛎️",
     "cleanliness": "🧼",
-    "overall": "⭐",
     "value": "💰",
     "location": "📍",
     "sleep_quality": "😴",
