@@ -8,21 +8,17 @@ df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/
 st.markdown("""
     <style>
         /* Fondo general */
-        .stApp {background: #f9f9f9;font-family: 'Segoe UI', sans-serif;}
+        .stApp {background: #f9f9f9; font-family: 'Segoe UI', sans-serif;}
 
         /* Título principal */
-        h1 {
-            color: #e01078;
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        h1 {text-align: center; margin-bottom: 30px;}
 
         /* Subtítulos (hoteles) */
         h3 {
             color: #2C3E50;
             font-size: 20px;
             margin-bottom: 5px;
-            border-left: 6px solid #3498db;
+            border-left: 6px solid #e01078;
             padding-left: 10px;
         }
 
