@@ -15,21 +15,19 @@ def parse_ratings(val):
 df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 
 # Emojis para cada atributo
-emoji_map = {
-    "service": "🛎️",
-    "cleanliness": "🧼",
-    "overall": "⭐",
-    "value": "💰",
-    "location": "📍",
-    "sleep_quality": "😴",
-    "rooms": "🚪"
-}
+emoji_map = {"service": "🛎️",
+            "cleanliness": "🧼",
+            "overall": "⭐",
+            "value": "💰",
+            "location": "📍",
+            "sleep_quality": "💤",
+            "rooms": "🚪"}
 
-# Estilos CSS
-st.markdown("""
-    <style>
+# Estilo y diseño
+st.markdown("""<style>
+# Fondo
         .stApp {
-            background: #f4f6f9;
+            background: #e61595;
             font-family: 'Segoe UI', sans-serif;
         }
         .card {
