@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
-import ast  # para convertir strings tipo diccionario a dict real
+import ast
 
 # Cargar dataset
 df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
 
-# Convertir la columna 'ratings' (que parece string con dict) a dict
+# Convertir columna ratings a diccionario
 def parse_ratings(val):
     try:
         return ast.literal_eval(val) if isinstance(val, str) else val
@@ -14,66 +14,68 @@ def parse_ratings(val):
 
 df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 
-# Diccionario de emojis por atributo
+# Emojis para cada atributo
 emoji_map = {
-    "overall": "⭐", 
     "service": "🛎️",
     "cleanliness": "🧼",
+    "overall": "⭐",
     "value": "💰",
     "location": "📍",
     "sleep_quality": "😴",
     "rooms": "🚪"
 }
 
-# Estilos globales
+# Estilos
 st.markdown("""
     <style>
-        /* Fondo general */
         .stApp {
-            background: #f9f9f9;
+            background: #f4f6f9;
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Título principal */
-        h1 {
-            color: #2C3E50;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        /* Subtítulos (hoteles) */
-        h3 {
-            color: #2C3E50;
-            font-size: 20px;
-            margin-bottom: 5px;
-            border-left: 6px solid #3498db;
-            padding-left: 10px;
-        }
-
-        /* Tarjetas */
-        .review-card {
+        /* Tarjetas generales */
+        .card {
             background: white;
-            padding: 20px;
-            margin: 15px 0;
+            padding: 18px;
+            margin: 12px 0;
             border-radius: 12px;
             box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
-            transition: transform 0.2s ease-in-out;
         }
-        .review-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0px 6px 14px rgba(0,0,0,0.12);
+
+        /* Título del hotel */
+        .hotel-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2C3E50;
+            border-left: 6px solid #3498db;
+            padding-left: 12px;
+            margin-bottom: 0;
         }
 
         /* Texto de review */
         .review-text {
             font-size: 15px;
-            color: #555;
-            margin-top: 8px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        /* Título de Ratings */
+        .ratings-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* Cada línea de rating */
+        .rating-line {
+            margin: 4px 0;
+            font-size: 15px;
+            color: #333;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Título
+# Título global
 st.title("🏨 Explorador de Reviews por Tópico y Hotel")
 
 # Filtros
@@ -99,17 +101,28 @@ filtered_df = filtered_df.head(n_reviews)
 for idx, row in filtered_df.iterrows():
     ratings_dict = row["ratings_parsed"]
 
-    st.markdown(f"<div class='review-card'><h3>🏨 {row['name']}</h3>", unsafe_allow_html=True)
+    # Título en su tarjeta
+    st.markdown(f"""
+        <div class="card">
+            <p class="hotel-title">🏨 {row['name']}</p>
+        </div>
+    """, unsafe_allow_html=True)
 
-    col1, col2 = st.columns([2, 1])  # review más ancho, ratings más angosto
+    # Texto de review en otra tarjeta
+    st.markdown(f"""
+        <div class="card">
+            <p class="review-text">{row['text']}</p>
+        </div>
+    """, unsafe_allow_html=True)
 
-    with col1:
-        st.markdown(f"<p class='review-text'>{row['text']}</p>", unsafe_allow_html=True)
+    # Ratings en su propia tarjeta
+    st.markdown("""
+        <div class="card">
+            <p class="ratings-title">Ratings:</p>
+    """, unsafe_allow_html=True)
 
-    with col2:
-        st.markdown("**Ratings:**")
-        for key, value in ratings_dict.items():
-            emoji = emoji_map.get(key, "🔹")
-            st.write(f"{emoji} {key.capitalize()}: {value}/5")
+    for key, value in ratings_dict.items():
+        emoji = emoji_map.get(key, "🔹")
+        st.markdown(f"<p class='rating-line'>{emoji} {key.capitalize()}: {value}/5</p>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
