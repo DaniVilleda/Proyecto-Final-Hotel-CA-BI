@@ -36,8 +36,9 @@ st.markdown("""
         .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
     /* Review */  
         .review-text { font-size: 15px; color: #444; line-height: 1.5; }
-    /* Título 'Ratings' */  
+    /* Título 'Ratings' y espaciado */  
         .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
+        .rating-line { margin: 5px 0; font-size: 15px; color: #333; }
     </style>
 """, unsafe_allow_html=True)
 
