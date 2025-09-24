@@ -8,8 +8,10 @@ df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/
 # Convertir columna ratings a diccionario
 def parse_ratings(val):
     try:
-        return ast.literal_eval(val) if isinstance(val, str) else val
-    except:
+        # Revisa si es un string antes de intentar evaluarlo
+        return ast.literal_eval(val) if isinstance(val, str) else {}
+    except (ValueError, SyntaxError):
+        # Si ast.literal_eval falla, devuelve un diccionario vacío
         return {}
 
 df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
@@ -92,9 +94,9 @@ else:
     filtered_df = filtered_df.drop_duplicates(subset=['name'])
 filtered_df = filtered_df.head(n_reviews)
 
+
 # Mostrar resultados
 for idx, row in filtered_df.iterrows():
-    # Creamos una copia para poder modificarla (con .pop()) sin afectar el dataframe original
     ratings_dict = row["ratings_parsed"].copy() if isinstance(row["ratings_parsed"], dict) else {}
 
     with st.container():
@@ -105,42 +107,32 @@ for idx, row in filtered_df.iterrows():
 
         col1, col2 = st.columns([2, 1])
 
-        # Columna 1: Review
+        # Columna 1: Review (Método simplificado y seguro)
         with col1:
-            # Construimos todo el HTML en un solo string
-            review_html = f"""
-            <div class="content-box">
-                <p class="review-text">{row['text']}</p>
-            </div>
-            """
-            st.markdown(review_html, unsafe_allow_html=True)
+            st.markdown('<div class="content-box">', unsafe_allow_html=True)
+            # Usamos st.markdown directamente con el texto, es más seguro
+            st.markdown(f"<p class='review-text'>{row['text']}</p>", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        # Columna 2: Ratings (CON LA LÓGICA DE ORDENAMIENTO)
+        # Columna 2: Ratings (Método simplificado y seguro)
         with col2:
-            # Empezamos a construir el string de HTML para los ratings
-            ratings_html = '<div class="content-box">'
-            ratings_html += '<p class="ratings-title">Ratings:</p>'
+            st.markdown('<div class="content-box">', unsafe_allow_html=True)
+            st.markdown('<p class="ratings-title">Ratings:</p>', unsafe_allow_html=True)
             
             if ratings_dict:
-                # 1. Sacamos 'overall' para tratarlo primero. Si no existe, devuelve None.
+                # Sacamos 'overall' para mostrarlo primero
                 overall_value = ratings_dict.pop('overall', None)
-                
-                # 2. Si encontramos un valor para 'overall', lo añadimos al HTML.
                 if overall_value is not None:
                     emoji = emoji_map.get('overall', "⭐")
-                    ratings_html += f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>'
+                    st.markdown(f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>', unsafe_allow_html=True)
                 
-                # 3. Ahora, iteramos sobre el RESTO de los items en el diccionario.
-                for key, value in sorted(ratings_dict.items()): # Usamos sorted() para un orden consistente
+                # Mostramos el resto de los ratings ordenados
+                for key, value in sorted(ratings_dict.items()):
                     emoji = emoji_map.get(key, "🔹")
-                    ratings_html += f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>'
+                    st.markdown(f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>', unsafe_allow_html=True)
             else:
-                ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
+                st.markdown('<p class="rating-line">No hay ratings disponibles.</p>', unsafe_allow_html=True)
             
-            # Cerramos el div
-            ratings_html += '</div>'
-            
-            # Renderizamos todo el bloque de HTML de una vez
-            st.markdown(ratings_html, unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
