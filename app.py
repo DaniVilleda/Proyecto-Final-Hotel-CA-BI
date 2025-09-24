@@ -15,14 +15,17 @@ def parse_ratings(val):
 df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 
 # Emojis para cada atributo
-emoji_map = {"service": "🛎️",
-            "cleanliness": "🧼",
-            "overall": "⭐",
-            "value": "💰",
-            "location": "📍",
-            "sleep_quality": "💤",
-            "rooms": "🚪"}
+emoji_map = {
+    "service": "🛎️",
+    "cleanliness": "🧼",
+    "overall": "⭐",
+    "value": "💰",
+    "location": "📍",
+    "sleep_quality": "💤",
+    "rooms": "🚪"
+}
 
+# Estilos CSS
 st.markdown("""
     <style>
         .stApp {
@@ -89,7 +92,6 @@ else:
     filtered_df = filtered_df.drop_duplicates(subset=['name'])
 filtered_df = filtered_df.head(n_reviews)
 
-
 # Mostrar resultados
 for idx, row in filtered_df.iterrows():
     # Creamos una copia para poder modificarla (con .pop()) sin afectar el dataframe original
@@ -129,7 +131,7 @@ for idx, row in filtered_df.iterrows():
                     ratings_html += f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>'
                 
                 # 3. Ahora, iteramos sobre el RESTO de los items en el diccionario.
-                for key, value in ratings_dict.items():
+                for key, value in sorted(ratings_dict.items()): # Usamos sorted() para un orden consistente
                     emoji = emoji_map.get(key, "🔹")
                     ratings_html += f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>'
             else:
