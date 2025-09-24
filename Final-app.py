@@ -5,7 +5,7 @@ import ast
 # Cargar dataset
 df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
 
-# Convertir columna ratings a diccionario de forma segura
+# Convertir columna ratings a diccionario
 def parse_ratings(val):
     try:
         return ast.literal_eval(val) if isinstance(val, str) else {}
@@ -13,21 +13,26 @@ def parse_ratings(val):
         return {}
 
 df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
-# Asegurarse de que el texto sea siempre un string para evitar errores
+# Asegurar que el texto sea siempre un string para evitar errores
 df['text'] = df['text'].astype(str)
 
 # Emojis para cada atributo
-emoji_map = {
-    "service": "🛎️", "cleanliness": "🧼", "overall": "⭐",
-    "value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"
-}
+emoji_map = {"service": "🛎️", 
+             "cleanliness": "🧼", 
+             "overall": "⭐",
+             "value": "💰", 
+             "location": "📍", 
+             "sleep_quality": "💤", 
+             "rooms": "🚪"}
 
-# Estilos CSS
+# Estilos y diseño base
 st.markdown("""
     <style>
+    /* Fondo general */
         .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+    /* Caja título hotel */
         .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
-        .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
+        .hotel-title { font-size: 22px; font-weight: bold; color: #e6158e; text-align: center; }
         .review-text { font-size: 15px; color: #444; line-height: 1.5; }
         .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
         .rating-line { margin: 5px 0; font-size: 15px; color: #333; }
