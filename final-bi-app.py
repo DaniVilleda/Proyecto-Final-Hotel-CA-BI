@@ -60,61 +60,61 @@ for idx, row in filtered_df.iterrows():
     st.markdown('<div class="card">', unsafe_allow_html=True)    
     st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns([2, 1, 2])
-
-    # Columna 1: Review
-    with col1:
-        review_html = f"""<div class="content-box"><p class="review-text">{row['text']}</p></div>"""
-        st.markdown(review_html, unsafe_allow_html=True)
-
-    # Columna 2: Ratings
-    with col2:
-        ratings_html = '<div class="content-box">'
-        ratings_html += '<p class="ratings-title">Ratings:</p>'
-        
-        if ratings_dict:
-            overall_value = ratings_dict.pop('overall', None)
-            if overall_value is not None:
-                emoji = emoji_map.get('overall', "⭐")
-                ratings_html += f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>'
+    col1, col2, col3 = st.columns([2, 1, 2])
+    
+        # Columna 1: Review
+        with col1:
+            review_html = f"""<div class="content-box"><p class="review-text">{row['text']}</p></div>"""
+            st.markdown(review_html, unsafe_allow_html=True)
+    
+        # Columna 2: Ratings
+        with col2:
+            ratings_html = '<div class="content-box">'
+            ratings_html += '<p class="ratings-title">Ratings:</p>'
             
-            for key, value in sorted(ratings_dict.items()):
-                emoji = emoji_map.get(key, "🔹")
-                ratings_html += f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>'
-        else:
-            ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
-        
-        ratings_html += '</div>'
-        st.markdown(ratings_html, unsafe_allow_html=True)
-
-    # Columna 3: Gráfico con la función nativa de Streamlit
-    with col3:
-        st.markdown('<div class="content-box">', unsafe_allow_html=True)
-        
-        # Re-copiamos el diccionario original porque en col2 usamos .pop() y lo modificamos
-        original_ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
-        
-        if original_ratings_dict:
-            # Convertimos los ratings a un formato numérico, ignorando los que no lo son
-            numeric_ratings = {}
-            for key, value in original_ratings_dict.items():
-                try:
-                    numeric_ratings[key] = float(value)
-                except (ValueError, TypeError):
-                    continue # Ignora este rating si no es un número
-
-            if numeric_ratings:
-                # Creamos un DataFrame simple para el gráfico
-                df_chart = pd.DataFrame.from_dict(numeric_ratings, orient='index', columns=['Puntaje'])
+            if ratings_dict:
+                overall_value = ratings_dict.pop('overall', None)
+                if overall_value is not None:
+                    emoji = emoji_map.get('overall', "⭐")
+                    ratings_html += f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>'
                 
-                # Usamos el comando integrado de Streamlit, ¡y listo!
-                st.bar_chart(df_chart, height=250)
+                for key, value in sorted(ratings_dict.items()):
+                    emoji = emoji_map.get(key, "🔹")
+                    ratings_html += f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>'
             else:
-                st.write("No hay ratings numéricos para graficar.")
-        else:
-            st.write("No hay ratings disponibles.")
+                ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
             
-        st.markdown('</div>', unsafe_allow_html=True)
+            ratings_html += '</div>'
+            st.markdown(ratings_html, unsafe_allow_html=True)
+    
+        # Columna 3: Gráfico con la función nativa de Streamlit
+        with col3:
+            st.markdown('<div class="content-box">', unsafe_allow_html=True)
+            
+            # Re-copiamos el diccionario original porque en col2 usamos .pop() y lo modificamos
+            original_ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
+            
+            if original_ratings_dict:
+                # Convertimos los ratings a un formato numérico, ignorando los que no lo son
+                numeric_ratings = {}
+                for key, value in original_ratings_dict.items():
+                    try:
+                        numeric_ratings[key] = float(value)
+                    except (ValueError, TypeError):
+                        continue # Ignora este rating si no es un número
+    
+                if numeric_ratings:
+                    # Creamos un DataFrame simple para el gráfico
+                    df_chart = pd.DataFrame.from_dict(numeric_ratings, orient='index', columns=['Puntaje'])
+                    
+                    # Usamos el comando integrado de Streamlit, ¡y listo!
+                    st.bar_chart(df_chart, height=250)
+                else:
+                    st.write("No hay ratings numéricos para graficar.")
+            else:
+                st.write("No hay ratings disponibles.")
+                
+            st.markdown('</div>', unsafe_allow_html=True)
 
     # Cierre
     st.markdown('</div>', unsafe_allow_html=True)
