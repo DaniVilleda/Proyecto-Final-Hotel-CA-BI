@@ -80,4 +80,4 @@ if filtered_df.empty:
     st.warning("⚠️ No se encontraron reviews que coincidan con los filtros seleccionados. Por favor, intenta con otra combinación.")
 else:
     for idx, row in filtered_df.iterrows():
-        st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html
+        # --- LÍNEA CORREGIDA AQU
