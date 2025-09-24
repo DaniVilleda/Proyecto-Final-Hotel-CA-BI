@@ -18,7 +18,7 @@ st.markdown("""
             color: #2C3E50;
             font-size: 20px;
             margin-bottom: 5px;
-            border-left: 6px solid #e01078;
+            border-left: 2px solid #e44a36;
             padding-left: 10px;
         }
 
