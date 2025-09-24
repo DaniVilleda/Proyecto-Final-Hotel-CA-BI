@@ -10,30 +10,13 @@ st.markdown("""
         /* Fondo general */
         .stApp {background: linear-gradient(135deg, #e8e5e3 0%, #d3dfe0 100%);font-family: 'Segoe UI', sans-serif;}
 
-        /* Títulos */
-        h1, h2, h3 {
-            color: #ff03cd;
-        }
-
-        /* Subtítulos */
-        .stMarkdown h2 {
-            border-left: 5px solid #ff03cd;
-            padding-left: 10px;
-        }
-
         /* Tarjetas para cada review */
-        .review-card {
-            background: white;
-            padding: 15px;
-            margin: 12px 0;
-            border-radius: 12px;
-            box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
-        }
+        .review-card {background: white; padding: 15px; margin: 12px 0; border-radius: 12px; box-shadow: 0px 3px 8px rgba(0,0,0,0.1);}
 
         /* Rating destacado */
         .rating {
             font-weight: bold;
-            color: #e67e22;
+            color: #ff03cd;
         }
 
         /* Separadores */
