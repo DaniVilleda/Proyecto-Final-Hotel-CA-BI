@@ -9,7 +9,7 @@ st.set_page_config(layout="wide")
 # Cargar dataset
 df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
 
-# --- NUEVA FUNCIÓN PARA CREAR ESTRELLAS ---
+# --- FUNCIÓN PARA CREAR ESTRELLAS ---
 def generate_stars(score):
     try:
         score = float(score)
@@ -22,7 +22,7 @@ def generate_stars(score):
             return "N/A"
     except (ValueError, TypeError):
         return "N/A"
-# -----------------------------------------
+# ------------------------------------
 
 # Convertir columna ratings a diccionario
 def parse_ratings(val):
@@ -35,19 +35,12 @@ df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
 df['text'] = df['text'].astype(str)
 
 # --- CÁLCULO DE PROMEDIOS POR HOTEL ---
-# Combinamos el nombre del hotel con sus ratings parseados
 df_for_avg = df[['name', 'ratings_parsed']].copy()
-# Expandimos el diccionario de ratings en columnas separadas
 ratings_df = pd.json_normalize(df_for_avg['ratings_parsed'])
-# Unimos los nombres de los hoteles con sus ratings expandidos
 full_ratings_df = pd.concat([df_for_avg['name'], ratings_df], axis=1)
-
-# Nos aseguramos de que todas las columnas de ratings sean numéricas
 rating_columns = ratings_df.columns
 for col in rating_columns:
     full_ratings_df[col] = pd.to_numeric(full_ratings_df[col], errors='coerce')
-
-# Agrupamos por nombre de hotel y calculamos el promedio de cada categoría
 average_ratings_per_hotel = full_ratings_df.groupby('name')[rating_columns].mean().round(1)
 # ------------------------------------
 
@@ -114,37 +107,4 @@ for idx, row in filtered_df.iterrows():
         else:
             ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
         
-        ratings_html += '</div>'
-        st.markdown(ratings_html, unsafe_allow_html=True)
-
-    # --- Columna 3: Gráfico Comparativo vs. Promedio del Hotel ---
-    with col3:
-        st.markdown('<div class="content-box">', unsafe_allow_html=True)
-        
-        hotel_name = row['name']
-        current_ratings_dict = row.get("ratings_parsed", {})
-        
-        if current_ratings_dict and hotel_name in average_ratings_per_hotel.index:
-            # Preparamos los datos del hotel actual
-            hotel_scores = {key: float(value) for key, value in current_ratings_dict.items() if str(value).replace('.', '', 1).isdigit()}
-            
-            # Obtenemos los promedios para este hotel en específico
-            hotel_avg_scores = average_ratings_per_hotel.loc[hotel_name]
-            
-            if hotel_scores:
-                # Creamos un DataFrame para la comparación
-                df_comparison = pd.DataFrame({
-                    'Esta Review': pd.Series(hotel_scores),
-                    'Promedio del Hotel': hotel_avg_scores
-                })
-                df_comparison.dropna(inplace=True) 
-
-                st.write("#### Comparativa de Ratings (vs. Promedio del Hotel)")
-                # Usamos el comando integrado de Streamlit
-                st.bar_chart(df_comparison, height=300)
-            else:
-                st.write("No hay ratings numéricos para graficar.")
-        else:
-            st.write("No hay ratings disponibles para comparar.")
-            
-        st.markdown('</div>', unsafe_allow_html=True)
+        ratings_html += '
