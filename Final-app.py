@@ -26,7 +26,6 @@ emoji_map = {
 st.markdown("""
     <style>
         .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
-        .card { background: #eaf0f7; padding: 22px; margin: 16px 0; border-radius: 14px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); }
         .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
         .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
         .review-text { font-size: 15px; color: #444; line-height: 1.5; }
