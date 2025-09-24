@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import ast
-import plotly.express as px # <--- 1. IMPORTAR PLOTLY
+import plotly.express as px 
 
 # Esta debe ser la primera commande de Streamlit en tu script
 st.set_page_config(layout="wide")
