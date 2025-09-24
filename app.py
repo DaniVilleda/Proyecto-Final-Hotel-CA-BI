@@ -17,8 +17,8 @@ st.markdown("""
         h3 {
             color: #2C3E50;
             font-size: 20px;
-            margin-bottom: 2px;
-            border-left: 2px solid #e44a36;
+            margin-bottom: 5px;
+            border-left: 4px solid #e44a36;
             padding-left: 10px;
         }
 
