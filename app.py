@@ -25,7 +25,7 @@ emoji_map = {
     "rooms": "🚪"
 }
 
-# Estilos CSS (sin cambios aquí, sigue siendo correcto)
+# Estilos CSS
 st.markdown("""
     <style>
         .stApp {
@@ -52,7 +52,6 @@ st.markdown("""
             font-weight: bold;
             color: #2C3E50;
             text-align: center;
-            /* Padding es manejado por content-box, no se necesita aquí */
         }
         .review-text {
             font-size: 15px;
@@ -93,16 +92,16 @@ else:
     filtered_df = filtered_df.drop_duplicates(subset=['name'])
 filtered_df = filtered_df.head(n_reviews)
 
-# --- INICIO DE LA LÓGICA CORREGIDA ---
 
 # Mostrar resultados
 for idx, row in filtered_df.iterrows():
-    ratings_dict = row["ratings_parsed"]
+    # Creamos una copia para poder modificarla (con .pop()) sin afectar el dataframe original
+    ratings_dict = row["ratings_parsed"].copy() if isinstance(row["ratings_parsed"], dict) else {}
 
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
 
-        # Título del hotel en su propio cuadro (esto ya estaba bien)
+        # Título del hotel en su propio cuadro
         st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
 
         col1, col2 = st.columns([2, 1])
@@ -117,13 +116,22 @@ for idx, row in filtered_df.iterrows():
             """
             st.markdown(review_html, unsafe_allow_html=True)
 
-        # Columna 2: Ratings
+        # Columna 2: Ratings (CON LA LÓGICA DE ORDENAMIENTO)
         with col2:
             # Empezamos a construir el string de HTML para los ratings
             ratings_html = '<div class="content-box">'
             ratings_html += '<p class="ratings-title">Ratings:</p>'
             
             if ratings_dict:
+                # 1. Sacamos 'overall' para tratarlo primero. Si no existe, devuelve None.
+                overall_value = ratings_dict.pop('overall', None)
+                
+                # 2. Si encontramos un valor para 'overall', lo añadimos al HTML.
+                if overall_value is not None:
+                    emoji = emoji_map.get('overall', "⭐")
+                    ratings_html += f'<p class="rating-line">{emoji} Overall: {overall_value}/5</p>'
+                
+                # 3. Ahora, iteramos sobre el RESTO de los items en el diccionario.
                 for key, value in ratings_dict.items():
                     emoji = emoji_map.get(key, "🔹")
                     ratings_html += f'<p class="rating-line">{emoji} {key.capitalize()}: {value}/5</p>'
