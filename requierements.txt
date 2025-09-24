@@ -1,19 +1,2 @@
-# Vector storage
-chromadb==0.5.0
-faiss-cpu==1.7.4
-
-# LangChain and its components
-langchain==0.2.2
-langchain-community==0.2.10
-langchain-openai==0.1.8
-
-# OpenAI and related
-openai==1.31.1
-tiktoken==0.7.0
-
-# Core and utility
-pandas
-plotly
-python-dotenv==1.0.1
 streamlit
-unstructured==0.14.4
+pandas
