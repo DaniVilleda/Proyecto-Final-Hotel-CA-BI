@@ -111,7 +111,7 @@ else:
             ratings_html += '</div>'
             st.markdown(ratings_html, unsafe_allow_html=True)
 
-        # --- Columna 3: Gráfico con Título en su Propia Caja ---
+        # --- Columna 3: Gráfico Apilado (Sin Plotly) ---
         with col3:
             hotel_name = row['name']
             current_ratings_dict = row.get("ratings_parsed", {})
@@ -120,16 +120,16 @@ else:
                 hotel_scores = {key: float(value) for key, value in current_ratings_dict.items() if str(value).replace('.', '', 1).isdigit()}
                 
                 if hotel_scores:
-                    # Paso 1: Poner el título dentro de su propio cuadro blanco
-                    st.markdown('<div class="content-box" style="margin-bottom: 0;"><p class="ratings-title">Comparativa de Ratings (vs. Promedio del Hotel)</p></div>', unsafe_allow_html=True)
+                    # Ponemos el título en su propia caja blanca
+                    st.markdown('<div class="content-box" style="padding-bottom: 0; margin-bottom: 0;"><p class="ratings-title">Calificación de la Review vs. Promedio del Hotel</p></div>', unsafe_allow_html=True)
                     
-                    # Paso 2: Mostrar el gráfico justo debajo
-                    df_comparison = pd.DataFrame({
-                        'Esta Review': pd.Series(hotel_scores),
-                        'Promedio del Hotel': average_ratings_per_hotel.loc[hotel_name]
-                    }).dropna()
+                    # Preparamos el DataFrame para el gráfico apilado
+                    comparison_df = pd.DataFrame({'Review': pd.Series(hotel_scores), 'Promedio': average_ratings_per_hotel.loc[hotel_name]}).dropna()
+                    stacked_df = pd.DataFrame(index=comparison_df.index)
+                    stacked_df['Promedio (Base)'] = comparison_df['Promedio']
+                    stacked_df['Mejora de la Review'] = (comparison_df['Review'] - comparison_df['Promedio']).clip(lower=0)
                     
-                    st.bar_chart(df_comparison, height=300)
+                    st.bar_chart(stacked_df, height=300)
                 else:
                     st.markdown('<div class="content-box"><p>No hay ratings numéricos para graficar.</p></div>', unsafe_allow_html=True)
             else:
