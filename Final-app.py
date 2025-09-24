@@ -31,10 +31,11 @@ st.markdown("""
         .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
         .review-text { font-size: 15px; color: #444; line-height: 1.5; }
         .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
+        .rating-line { margin: 5px 0; font-size: 15px; color: #333; }
     </style>
 """, unsafe_allow_html=True)
 
-# 1. TÍTULO PRINCIPAL RESTAURADO
+# Título principal de la aplicación
 st.title("🏨 Explorador de Reviews por Tópico y Hotel")
 
 # Filtros
@@ -56,7 +57,7 @@ filtered_df = filtered_df.head(n_reviews)
 for idx, row in filtered_df.iterrows():
     ratings_dict = row.get("ratings_parsed", {}).copy() if isinstance(row.get("ratings_parsed"), dict) else {}
 
-    # 2. SE ELIMINÓ EL "with st.container()" QUE CAUSABA LOS CUADROS EXTRA
+    # El div "card" es nuestro contenedor principal, no necesitamos st.container()
     st.markdown('<div class="card">', unsafe_allow_html=True)
     
     st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
