@@ -144,31 +144,33 @@ with tab1:
        
 with tab2:
     st.markdown("### 🗺️ Mapa de hoteles en California")
-    data_url2 = "https://raw.githubusercontent.com/melody-10/Proyecto_Hoteles_California/main/hotels_ca.csv"
-data_url3 = "https://raw.githubusercontent.com/melody-10/Proyecto_Hoteles_California/main/BBDD_BI.csv"
+    url_coordenadas = "https://raw.githubusercontent.com/0241603-cmyk/PROYECTO-FINAL/main/hotels_ca.csv"
+url_profesor = "https://raw.githubusercontent.com/0241603-cmyk/PROYECTO-FINAL/main/Prof_BBDD_BI.csv"
 
-df_coordenadas = pd.read_csv(data_url2)
-df_profesor = pd.read_csv(data_url3)
+df_coordenadas = pd.read_csv(url_coordenadas)
+df_profesor = pd.read_csv(url_profesor)
 
-# Filtrar solo hoteles abiertos
-df_coordenadas = df_coordenadas[df_coordenadas["is_open"] == 1].reset_index(drop=True)
-df_profesor = df_profesor[df_profesor["is_open"] == 1].reset_index(drop=True)
 
-# Crear dataframes con columnas necesarias
-df_coord = df_coordenadas[["name", "latitude", "longitude", "address"]]
-df_prof = df_profesor[["name", "latitude", "longitude", "address"]]
+# --- Filtrar solo hoteles abiertos (si existe columna 'is_open') ---
+if "is_open" in df_coordenadas.columns:
+    df_coordenadas = df_coordenadas[df_coordenadas["is_open"] == 1].reset_index(drop=True)
+if "is_open" in df_profesor.columns:
+    df_profesor = df_profesor[df_profesor["is_open"] == 1].reset_index(drop=True)
 
-# Unir los dataframes
-df_final = pd.concat([df_coord, df_prof])
+# --- Seleccionar columnas necesarias ---
+cols = ["name", "latitude", "longitude", "address"]
+df_coord = df_coordenadas[cols].copy()
+df_prof = df_profesor[cols].copy()
 
-# Eliminar duplicados por nombre y dirección
+# --- Unir datasets y eliminar duplicados ---
+df_final = pd.concat([df_coord, df_prof], ignore_index=True)
 df_final = df_final.drop_duplicates(subset=["name", "address"], keep="first")
 
-# Crear mapa centrado en California
+# --- Crear mapa centrado en California ---
 mapa = folium.Map(location=[36.7783, -119.4179], zoom_start=6)
 
-# Agregar hoteles como marcadores
-for i, row in df_final.iterrows():
+# --- Agregar marcadores ---
+for _, row in df_final.iterrows():
     if pd.notna(row["latitude"]) and pd.notna(row["longitude"]):
         folium.Marker(
             location=[row["latitude"], row["longitude"]],
@@ -183,5 +185,5 @@ for i, row in df_final.iterrows():
             )
         ).add_to(mapa)
 
-# Mostrar mapa en Streamlit
+# --- Mostrar mapa en Streamlit ---
 st_data = st_folium(mapa, width=700, height=500)
