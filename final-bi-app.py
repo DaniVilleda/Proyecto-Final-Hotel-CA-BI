@@ -1,101 +1,82 @@
+# mapa_app.py
+
 import streamlit as st
 import pandas as pd
-import ast
-import math
+import folium
+from streamlit_folium import st_folium
 
-# Configuración de la página para que ocupe todo el ancho
-st.set_page_config(layout="wide")
+# --- Configuración de la página ---
+st.set_page_config(
+    page_title="Mapa Interactivo",
+    page_icon="🗺️",
+    layout="wide"
+)
 
-# Cargar dataset
-df = pd.read_csv("https://github.com/melody-10/Proyecto_Hoteles_California/blob/main/final_database.csv?raw=true")
+# --- Título de la aplicación ---
+st.title("🗺️ Mapa Interactivo con Folium en Streamlit")
+st.markdown("Este es un ejemplo de cómo integrar un mapa personalizable en tu aplicación.")
 
-# --- NUEVA FUNCIÓN PARA CREAR ESTRELLAS ---
-def generate_stars(score):
-    try:
-        score = float(score)
-        if 0 <= score <= 5:
-            full_stars = math.floor(score)
-            half_star = "★" if score - full_stars >= 0.5 else "" # Usamos una estrella diferente para media
-            empty_stars = 5 - full_stars - len(half_star)
-            return f"<span style='color: #FFD700;'>{'★' * full_stars}{half_star}{'☆' * empty_stars}</span> ({score})"
-        else:
-            return "N/A"
-    except (ValueError, TypeError):
-        return "N/A"
-# -----------------------------------------
+# --- Creación de los Datos ---
+# Puedes reemplazar esta sección para cargar tus propios datos desde un CSV, Excel, etc.
+# Por ejemplo: df = pd.read_csv('tus_datos.csv')
+data = {
+    'Nombre': ['Ciudad de México', 'Guadalajara', 'Monterrey', 'Cancún', 'Tijuana'],
+    'Descripcion': [
+        'La capital del país, un centro cultural y financiero.',
+        'Conocida por el tequila y la música mariachi.',
+        'Importante centro industrial y de negocios.',
+        'Destino turístico famoso por sus playas caribeñas.',
+        'Una de las ciudades fronterizas más visitadas del mundo.'
+    ],
+    'lat': [19.432608, 20.659698, 25.686613, 21.161908, 32.514947],
+    'lon': [-99.133209, -103.349609, -100.316116, -86.851524, -117.038246],
+    'icono': ['star', 'music', 'industry', 'umbrella-beach', 'car']
+}
+df = pd.DataFrame(data)
 
-# Convertir columna ratings a diccionario
-def parse_ratings(val):
-    try:
-        return ast.literal_eval(val) if isinstance(val, str) else {}
-    except (ValueError, SyntaxError):
-        return {}
+st.write("### Datos de las Ubicaciones")
+st.dataframe(df)
 
-df["ratings_parsed"] = df["ratings"].apply(parse_ratings)
-df['text'] = df['text'].astype(str)
+# --- Creación del Mapa ---
 
-# Emojis para cada atributo
-emoji_map = {"service": "🛎️", "cleanliness": "🧼", "overall": "⭐","value": "💰", "location": "📍", "sleep_quality": "💤", "rooms": "🚪"}
+# 1. Calcular el centro del mapa para que todas las ubicaciones sean visibles.
+map_center = [df['lat'].mean(), df['lon'].mean()]
 
-# Estilos y diseño
-st.markdown("""<style>
-    .stApp { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
-    .content-box { background: white; padding: 18px; border-radius: 10px; box-shadow: 0px 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; height: 100%; }
-    .hotel-title { font-size: 22px; font-weight: bold; color: #2C3E50; text-align: center; }
-    .review-text { font-size: 15px; color: #444; line-height: 1.5; }
-    .ratings-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #2C3E50; }
-    .rating-line { margin: 8px 0; font-size: 15px; color: #333; display: flex; align-items: center; justify-content: space-between; }
-    </style>""", unsafe_allow_html=True)
+# 2. Crear el objeto de mapa base con Folium.
+#    - location: Coordenadas donde se centrará el mapa.
+#    - zoom_start: Nivel de zoom inicial.
+#    - tiles: Estilo del mapa de fondo (otras opciones: 'Stamen Terrain', 'CartoDB dark_matter').
+m = folium.Map(location=map_center, zoom_start=5, tiles='CartoDB positron')
 
-# Título principal de la aplicación
-st.title("🏨 Explorador de Reviews por Tópico y Hotel")
+# 3. Añadir un marcador para cada fila en el DataFrame.
+for index, row in df.iterrows():
+    # Crear el contenido del pop-up (lo que se ve al hacer clic)
+    popup_content = f"""
+    <h5><b>{row['Nombre']}</b></h5>
+    <p>{row['Descripcion']}</p>
+    """
 
-# Filtros
-topics = df['topic_label'].unique().tolist()
-selected_topic = st.selectbox("📌 Selecciona un tópico", topics)
-hotel_options = ['Todos'] + sorted(df['name'].unique().tolist())
-selected_hotel = st.selectbox("🏩 Selecciona un hotel", hotel_options)
-n_reviews = st.slider("📊 Número máximo de reviews a mostrar", 1, 20, 5)
-
-# Filtrado de datos
-filtered_df = df[df['topic_label'] == selected_topic]
-if selected_hotel != 'Todos':
-    filtered_df = filtered_df[filtered_df['name'] == selected_hotel]
-else:
-    filtered_df = filtered_df.drop_duplicates(subset=['name'])
-filtered_df = filtered_df.head(n_reviews)
-
-# Mostrar resultados
-for idx, row in filtered_df.iterrows():
-    ratings_dict = row.get("ratings_parsed", {}).copy()
-    
-    st.markdown(f"<div class='content-box hotel-title'>🏨 {row['name']}</div>", unsafe_allow_html=True)
-
-    col1, col2 = st.columns([2, 1])
-
-    # Columna 1: Review
-    with col1:
-        review_html = f"""<div class="content-box"><p class="review-text">{row['text']}</p></div>"""
-        st.markdown(review_html, unsafe_allow_html=True)
-
-    # Columna 2: Ratings con estrellas
-    with col2:
-        ratings_html = '<div class="content-box">'
-        ratings_html += '<p class="ratings-title">Ratings:</p>'
+    folium.Marker(
+        # Coordenadas del marcador
+        location=[row['lat'], row['lon']],
         
-        if ratings_dict:
-            overall_value = ratings_dict.pop('overall', None)
-            if overall_value is not None:
-                emoji = emoji_map.get('overall', "⭐")
-                stars = generate_stars(overall_value)
-                ratings_html += f'<div class="rating-line"><span>{emoji} Overall</span> <span>{stars}</span></div>'
-            
-            for key, value in sorted(ratings_dict.items()):
-                emoji = emoji_map.get(key, "🔹")
-                stars = generate_stars(value)
-                ratings_html += f'<div class="rating-line"><span>{emoji} {key.capitalize()}</span> <span>{stars}</span></div>'
-        else:
-            ratings_html += '<p class="rating-line">No hay ratings disponibles.</p>'
+        # Pop-up que aparece al hacer clic
+        popup=folium.Popup(popup_content, max_width=300),
         
-        ratings_html += '</div>'
-        st.markdown(ratings_html, unsafe_allow_html=True)
+        # Tooltip que aparece al pasar el mouse
+        tooltip=f"Clic para ver más sobre <b>{row['Nombre']}</b>",
+        
+        # Icono personalizado
+        icon=folium.Icon(color='blue', prefix='fa', icon=row['icono'])
+    ).add_to(m)
+
+
+# --- Mostrar el Mapa en Streamlit ---
+st.write("### Mapa de Ubicaciones")
+
+# Usamos st_folium para renderizar el mapa de Folium.
+# El parámetro `returned_objects` puede capturar eventos como clics en el mapa.
+map_data = st_folium(m, width='100%', height=500)
+
+st.write("---")
+st.info("💡 **Tip:** Pasa el mouse sobre un marcador para ver su nombre y haz clic para obtener más detalles.")
